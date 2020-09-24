@@ -247,6 +247,24 @@ while True:
                 interference = interference + (1 / denominator)
 
         print('5. interference :', interference)
+        
+        '''
+        normalize_d = []
+        for tf in d_list:
+            gp_x, gp_y = tf[0] - b_x,tf[1] - b_y
+            gp_size = getEuclidean([gp_x,gp_y],[0,0])
+            normalize_d.append([gp_x/gp_size,gp_y/gp_size])
+
+        test_int = 0
+        for ts in obstacle_candidates:
+            p_x, p_y = ts[0] - b_x,ts[1] - b_y
+            p_size = getEuclidean([p_x,p_y],[0,0]) **2
+            for nd in normalize_d:
+                dot = np.dot([p_x,p_y],[nd[0],nd[1]]) **2
+                test_int += 1 / ((p_size - dot) ** 0.5 + self_epsilon)
+        
+        print('5. interference :', test_int)
+        '''
         break
 
 if not (check_ball and check_gp):

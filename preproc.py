@@ -224,8 +224,8 @@ while True:
         first_term = np.array([gp_x - b_x, gp_y - b_y])
         for p_x, p_y, p_w, p_h in playerList:
             second_term = np.array([p_x - b_x, p_y - b_y])
-            result = np.cross(first_term, second_term)
-            if result <= 0:
+            result = np.dot(first_term, second_term)
+            if result >= 0:
                 obstacle_candidates.append([p_x, p_y])
 
         self_epsilon = 1

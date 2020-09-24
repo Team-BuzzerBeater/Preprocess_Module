@@ -207,25 +207,24 @@ while True:
         4. 공과 선수들의 유클리드 거리 역수 총합
         '''
         concentration = 0
-        for p_x, p_y, p_w, p_h in playerInfo:
+        for p_x, p_y, p_w, p_h in playerList:
             dist = getEuclidean([b_x, b_y], [p_x, p_y]) + sys.float_info.epsilon
             dist = 1 / dist
             concentration = concentration + dist
-        # print(concentration)
+        print('4. concentration :', concentration)
 
         '''
         5. 공 진행방향에 대한 선수들의 방해도
         '''
         d_list = gp_loc_list
         d_list.append([gp_x, gp_y])
-        # print(d_list)
 
         interference = 0
         obstacle_candidates = []
         first_term = np.array([gp_x - b_x, gp_y - b_y])
-        for p_x, p_y, p_w, p_h in playerInfo:
-            second_term = np.array([float(p_x) - b_x, float(p_y) - b_y])
-            result = np.cross(first_term, third_term)
+        for p_x, p_y, p_w, p_h in playerList:
+            second_term = np.array([p_x - b_x, p_y - b_y])
+            result = np.cross(first_term, second_term)
             if result <= 0:
                 obstacle_candidates.append([p_x, p_y])
 
@@ -238,7 +237,7 @@ while True:
             for d in d_list:
                 alpha, beta = d[0], d[1]
 
-                numerator = np.dot([alpha - b_x, beta - b_y], [float(p_x) - b_x, float(p_y) - b_y])
+                numerator = np.dot([alpha - b_x, beta - b_y], [p_x - b_x, p_y - b_y])
                 denominator = (getEuclidean([alpha, beta], [b_x, b_y]) * getEuclidean([p_x, p_y], [b_x, b_y]))
                 theta = numerator / denominator
                 theta_list.append(math.acos(theta))
@@ -247,7 +246,7 @@ while True:
                 denominator = getEuclidean([p_x, p_y], [b_x, b_y]) * math.sin(theta) + self_epsilon
                 interference = interference + (1 / denominator)
 
-        # print(interference)
+        print('5. interference :', interference)
         break
 
 if not (check_ball and check_gp):

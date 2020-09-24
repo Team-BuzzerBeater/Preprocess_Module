@@ -102,7 +102,6 @@ while True:
             if goalpost is not None:
                 check_gp = True
                 gpInfo.append(getLoc(line))
-                # print('goalpost :', goalpost)
 
         elif isWord(line, 'ball'):
             # get Ball precision
@@ -110,29 +109,31 @@ while True:
             if ball is not None:
                 check_ball = True
                 ballInfo.append(getLoc(line))
-                # print('ball :', ball)
 
     # 공과 골대를 찾은 경우
     if(check_ball and check_gp):
-        # print("ball :", ball)
-        # print("gopo :", goalpost)
-        print('plyr location :', playerInfo)
-        print('gopo location :', gpInfo)
-        print('ball location :', ballInfo)
+        # print("ball precision :", ball)
+        # print("gopo precision :", goalpost)
+        # print('plyr location :', playerInfo)
+        # print('gopo location :', gpInfo)
+        # print('ball location :', ballInfo)
 
         # 공과 골대의 중심좌표, width, height 구하기
         b_x, b_y, b_w, b_h = getRealLoc(ballInfo)
         gp_x, gp_y, gp_w, gp_h = getRealLoc(gpInfo)
-        # print(gp_x, gp_y, gp_w, gp_h)
+        playerList = []
 
-        # 이제 수식을 하나씩 완성해볼까용
+        for i in playerInfo:
+            playerList.append(getRealLoc([i]))
+        # print('공의 중심좌표 :', b_x, b_y, b_w, b_h)
+        # print('골대 중심좌표 :', gp_x, gp_y, gp_w, gp_h)
+        # print('선수 중심좌표 :', playerList)
+
         '''
          1. 공과 골대간의 유클리드 거리
         '''
         distance = np.sqrt((b_x - gp_x)**2 + (b_y - gp_y)**2)
-        # print(b_x, b_y)
-        # print(gp_x, gp_y)
-        # print(distance)
+        print('1. distance :', distance)
 
         '''
         2. 공과 골대간의 선수 명수
@@ -157,7 +158,7 @@ while True:
         gp_loc_list.append([gp_right_top_x, gp_right_top_y])
         gp_loc_list.append([gp_left_bot_x, gp_left_bot_y])
         gp_loc_list.append([gp_right_bot_x, gp_right_bot_y])
-        # print(gp_loc_list)
+        # print('골대 4개 꼭짓점 :', gp_loc_list)
 
         combi_list = itertools.combinations(gp_loc_list, 2)
         triangleMaxArea = 0
@@ -170,9 +171,11 @@ while True:
                 triangleMaxArea = area
                 gpMax1_x, gpMax1_y = first[0], first[1]
                 gpMax2_x, gpMax2_y = second[0], second[1]
-        # print(gpMax1_x, gpMax1_y, gpMax2_x, gpMax2_y)
+        # print('선택된 골대 꼭짓점 :', gpMax1_x, gpMax1_y, gpMax2_x, gpMax2_y)
 
-        for p_x, p_y, p_w, p_h in playerInfo:
+        for p_x, p_y, p_w, p_h in playerList:
+            # print('선수 중심좌표 :', p_x, p_y, p_w, p_h)
+
             first_term = np.array([gpMax1_x - b_x, gpMax1_y - b_y])
             second_term = np.array([gpMax2_x - b_x, gpMax2_y - b_y])
             third_term = np.array([b_x - float(p_x), b_y - float(p_y)])
@@ -182,20 +185,23 @@ while True:
 
             result = np.dot(cross1, cross2)
 
-            if result > 0:
+            if result < 0:
                 obstacle = obstacle + 1
-        # print(obstacle)
+                # print('삼각형에 포함된 선수 중심좌표 :', p_x, p_y)
+
+        print('2. obstacle :', obstacle)
 
         '''
         3. 공 근처의 선수 명 수
         '''
-        threshold = 10
+        threshold = 100
         disturbance = 0
-        for p_x, p_y, p_w, p_h in playerInfo:
+        for p_x, p_y, p_w, p_h in playerList:
             dist = getEuclidean([b_x, b_y], [p_x, p_y])
+            # print('공과 선수간의 거리 :', dist)
             if dist < threshold:
                 disturbance = disturbance + 1
-        # print(disturbance)
+        print('3. disturbance :', disturbance)
 
         '''
         4. 공과 선수들의 유클리드 거리 역수 총합
